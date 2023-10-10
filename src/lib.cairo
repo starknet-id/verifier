@@ -1,3 +1,6 @@
+#[cfg(test)]
+mod tests;
+
 #[starknet::interface]
 trait IVerifier<TContractState> {
     fn write_confirmation(
@@ -16,7 +19,9 @@ trait IVerifier<TContractState> {
 trait IStarknetID<TContractState> {
     fn owner_of(self: @TContractState, token_id: felt252) -> starknet::ContractAddress;
 
-    fn set_verifier_data(self: @TContractState, token_id: felt252, field: felt252, data: felt252);
+    fn set_verifier_data(
+        self: @TContractState, token_id: felt252, field: felt252, data: felt252, domain: u32
+    );
 }
 
 #[starknet::contract]
@@ -89,8 +94,9 @@ mod Verifier {
             let is_valid = check_ecdsa_signature(message_hash, public_key, sig_0, sig_1);
             assert(is_valid, 'Invalid signature');
 
+            // writing on Starknet for now, in the future support volition
             super::IStarknetIDDispatcher { contract_address: starknetid_contract }
-                .set_verifier_data(token_id, field, data);
+                .set_verifier_data(token_id, field, data, 0);
         }
 
         fn upgrade(ref self: ContractState, new_class_hash: starknet::ClassHash) {
