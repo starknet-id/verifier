@@ -5,8 +5,8 @@ mod tests;
 trait IVerifier<TContractState> {
     fn write_confirmation(
         ref self: TContractState,
-        token_id: felt252,
-        timestamp: felt252,
+        token_id: u128,
+        timestamp: u64,
         field: felt252,
         data: felt252,
         sig: (felt252, felt252)
@@ -17,10 +17,10 @@ trait IVerifier<TContractState> {
 
 #[starknet::interface]
 trait IStarknetID<TContractState> {
-    fn owner_of(self: @TContractState, token_id: felt252) -> starknet::ContractAddress;
+    fn owner_of(self: @TContractState, token_id: u128) -> starknet::ContractAddress;
 
     fn set_verifier_data(
-        self: @TContractState, token_id: felt252, field: felt252, data: felt252, domain: u32
+        self: @TContractState, token_id: u128, field: felt252, data: felt252, domain: u32
     );
 }
 
@@ -59,25 +59,20 @@ mod Verifier {
     impl VerifierImpl of super::IVerifier<ContractState> {
         fn write_confirmation(
             ref self: ContractState,
-            token_id: felt252,
-            timestamp: felt252,
+            token_id: u128,
+            timestamp: u64,
             field: felt252,
             data: felt252,
             sig: (felt252, felt252)
         ) {
             let caller = get_caller_address();
             let starknetid_contract = self.starknetid_contract.read();
-            // todo: commented this 2 lines to run tests as we cannot mock calls w/ protostar
             let owner = super::IStarknetIDDispatcher { contract_address: starknetid_contract }
                 .owner_of(token_id);
             assert(caller == owner, 'Caller is not owner');
 
             // ensure confirmation is not expired
-            let current_timestamp = get_block_timestamp();
-            assert(
-                current_timestamp <= timestamp.try_into().expect('error converting felt to u64'),
-                'Confirmation is expired'
-            );
+            assert(get_block_timestamp() <= timestamp, 'Confirmation is expired');
 
             let (sig_0, sig_1) = sig;
             let is_blacklisted = self.blacklisted_point.read(sig_0);
@@ -88,7 +83,8 @@ mod Verifier {
             self.blacklisted_point.write(sig_0, true);
 
             let message_hash: felt252 = hash::LegacyHash::hash(
-                hash::LegacyHash::hash(hash::LegacyHash::hash(token_id, timestamp), field), data
+                hash::LegacyHash::hash(hash::LegacyHash::hash(token_id.into(), timestamp), field),
+                data
             );
             let public_key = self.public_key.read();
             let is_valid = check_ecdsa_signature(message_hash, public_key, sig_0, sig_1);
