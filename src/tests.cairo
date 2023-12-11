@@ -26,7 +26,7 @@ fn test_basic_usage() {
     set_contract_address(caller);
 
     let identity = IIdentityDispatcher {
-        contract_address: deploy(Identity::TEST_CLASS_HASH, ArrayTrait::new())
+        contract_address: deploy(Identity::TEST_CLASS_HASH, array![0, 0])
     };
 
     // mint id 1
