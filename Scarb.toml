@@ -1,21 +1,15 @@
 [package]
 name = "verifier"
 version = "0.1.0"
-
-# See more keys and their definitions at https://docs.swmansion.com/scarb/docs/reference/manifest.html
+authors = ["th0rgal <thomas@starknet.id>", "irisdv <iris@starknet.id>"]
 
 [dependencies]
-starknet = "2.3.0-rc0"
-identity = { git = "https://github.com/starknet-id/identity.git", branch = "master" }
+starknet = "2.3.1"
+identity = { git = "https://github.com/starknet-id/identity.git", rev = "698debdfd63a1b366074685f58ebb779d201eeed" }
 
 [[target.starknet-contract]]
-# Enable Sierra codegen.
 sierra = true
-
-# Enable CASM codegen.
 casm = true
-
-# Emit Python-powered hints in order to run compiled CASM class with legacy Cairo VM.
 casm-add-pythonic-hints = true
 
 [lib]
