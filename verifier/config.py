@@ -29,7 +29,7 @@ class TomlConfig(Config):
         self.server_port = server["port"]
 
         starknet = config["starknet"]
-        self.starknetid_contract = starknet["starknetid_contract"]
+        self.identity_contract = starknet["identity_contract"]
         self.verifier_contract = starknet["verifier_contract"]
         self.verifier_key = starknet["verifier_key"]
 
