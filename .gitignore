@@ -1,5 +1,6 @@
 backups/**
 config.toml
+.deployments
 
 ### Python ###
 # Byte-compiled / optimized / DLL files
