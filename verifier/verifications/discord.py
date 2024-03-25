@@ -18,6 +18,8 @@ async def start_discord(conf, code):
             headers={"Content-Type": "application/x-www-form-urlencoded"},
         )
         if resp.status != 200:
+            error_content = await resp.text()
+            print(f"Error: {error_content}")
             raise WrongRequestException()
 
         content = await resp.json()
@@ -31,6 +33,7 @@ async def start_discord(conf, code):
         if resp.status != 200:
             raise WrongRequestException()
         content = await resp.json()
+        print(content)
         user_id = content["id"]
         username = content["username"]
         discriminator = content["discriminator"]
